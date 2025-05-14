@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ssh -p 7022 localhost
+
+
