@@ -11,7 +11,7 @@ RUN dnf install -y \
 
 RUN git clone https://src.fedoraproject.org/rpms/rocm-rpm-macros.git
 RUN dnf -y builddep rocm-rpm-macros/rocm-rpm-macros.spec
-RUN spectool -g -R rocm-rpm-macros/rocm-rpm-macros.spec
+RUN rpmdev-setuptree
 RUN cp rocm-rpm-macros/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocm-rpm-macros/rocm-rpm-macros.spec
 
