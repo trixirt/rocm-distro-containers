@@ -6,10 +6,11 @@ Build:
 docker build -t <os> .
 
 Run:
-docker run --volume <host-path>:<container-path> -it --rm -p 8080:8080 <os>
+docker run --volume <host-path>:<container-path> -it --rm -p 8080:8080 --cpus=<num> <os>
 
 --volume is option
--p is optiona
+-p is optional
+--cpus is optional but useful.
 
 ---
 Setup the host
@@ -236,6 +237,47 @@ RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
 Finally, change the CMD at the bottom to run the tests
 
 CMD ["rocblas-test"]
+
+3. Picking which GPU to test
+
+-e HIP_VISIBLE_DEVICES=0
+
+When the system has multiple GPU's, you may face a problem like
+
+Query device success: there are 2 devices
+-------------------------------------------------------------------------------
+Device ID 0 : AMD Radeon Pro W7900 gfx1100
+with 48.3 GB memory, max. SCLK 1760 MHz, max. MCLK 1124 MHz, memoryBusWidth 48 Bytes, compute capability 11.0
+maxGridDimX 2147483647, sharedMemPerBlock 65.5 KB, maxThreadsPerBlock 1024, warpSize 32
+-------------------------------------------------------------------------------
+Device ID 1 : AMD Radeon Graphics gfx1036
+with 67.1 GB memory, max. SCLK 2200 MHz, max. MCLK 1800 MHz, memoryBusWidth 16 Bytes, compute capability 10.3
+maxGridDimX 2147483647, sharedMemPerBlock 65.5 KB, maxThreadsPerBlock 1024, warpSize 32
+-------------------------------------------------------------------------------
+info: parsing of test data may take a couple minutes before any test output appears...
+
+Note: Google Test filter = -:*stress*
+[==========] Running 1254647 tests from 210 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from _/multiheaded
+
+rocBLAS error: Cannot read /lib64/rocblas/library/TensileLibrary.yaml: No such file or directory for GPU arch : gfx1036
+
+Read the HIP docs ex/
+https://rocm.docs.amd.com/projects/HIP/en/docs-6.0.0/how_to_guides/debugging.html
+
+    Making Device visible
+
+    For system with multiple devices, it’s possible to make only certain
+    device(s) visible to HIP via setting environment variable,
+    HIP_VISIBLE_DEVICES(or CUDA_VISIBLE_DEVICES on Nvidia platform), only
+    devices whose index is present in the sequence are visible to HIP.
+
+    For example,
+
+    HIP_VISIBLE_DEVICES=0,1
+
+Pass -e HIP_VISIBLE_DEVICES=<num> in the docker run
 
 
 
