@@ -59,6 +59,183 @@ On a machine with a AMD GPU, run the container
 
 # docker run --device /dev/kfd --device /dev/dri -it --rm test
 
+2. Creating a new test
+
+Use the source! Here is how the librocfft0 check docker comparse to the
+build docker.
+
+> cd opensuse/tumbleweed/librocfft0/
+
+$ diff -u Dockerfile check/Dockerfile
+--- Dockerfile	2025-06-04 13:47:33.596666381 -0700
++++ check/Dockerfile	2025-06-04 14:28:38.120159800 -0700
+@@ -11,6 +11,17 @@
+ RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
+ RUN zypper -n si librocfft0
+ RUN zypper -n si -d librocfft0
+-RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
+ 
+-CMD ["bash"]
+\ No newline at end of file
++RUN zypper -n install \
++ rocrand-devel \
++ fftw-devel \
++ boost-devel \
++ hipcc-libomp-devel \
++ hiprand-devel \
++ gtest
++
++RUN rpmbuild --with test -ba ~/rpmbuild/SPECS/*.spec
++
++RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
++
++CMD ["rocfft-test"]
+\ No newline at end of file
+
+Same diff, now annotated
+
+$ diff -u Dockerfile check/Dockerfile
+--- Dockerfile	2025-06-04 13:47:33.596666381 -0700
++++ check/Dockerfile	2025-06-04 14:28:38.120159800 -0700
+@@ -11,6 +11,17 @@
+ RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
+ RUN zypper -n si librocfft0
+ RUN zypper -n si -d librocfft0
+-RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
++RUN rpmbuild --with test -ba ~/rpmbuild/SPECS/*.spec
+
+The rpm is built with an option '--with test', in the specfile this is this
+section
+
+%bcond_with test
+%if %{with test}
+# Disable rpatch checks for a local build
+%global __brp_check_rpaths %{nil}
+%global build_test ON
+%else
+%global build_test OFF
+%endif
+
+Look for instances of %if %{with test}, in the specfile.
+
+\ No newline at end of file
++RUN zypper -n install \
++ rocrand-devel \
++ fftw-devel \
++ boost-devel \
++ hipcc-libomp-devel \
++ hiprand-devel \
++ gtest
++
+
+Building for testing requires other dependencies to be installed.
+This is the part that will change dependent on the package.  You can find
+the list by looking in the specfile, like for rocfft.spec
+
+%if %{with test}
+BuildRequires:  rocrand-devel
+BuildRequires:  fftw-devel
+BuildRequires:  boost-devel
+BuildRequires:  hipcc-libomp-devel
+BuildRequires:  hiprand-devel
+
+%if 0%{?suse_version}
+BuildRequires:  gtest
+%else
+BuildRequires:  gtest-devel
+%endif
+
+Note, because this is a suse test, we install gtest over gtest-devel, like
+we do for fedora or rhel.
+
++RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+
+This installs all the rpms that were just built, including the test rpms.
+
+-CMD ["bash"]
++CMD ["rocfft-test"]
+
+Changing the run command from bash to the just installed rocfft-test
+
+Apply this to creating a test for opensuse rocblas.
+
+$ cd opensuse/tumbleweed/librocblas4
+$ mkdir check
+$ cp Dockerfile check/
+
+Review the rocblas.spec file for test dependencies. From these lines in the
+spec file
+
+%if %{with test}
+
+BuildRequires:  blas-devel
+BuildRequires:  libomp-devel
+BuildRequires:  python3dist(pyyaml)
+BuildRequires:  rocminfo
+BuildRequires:  rocm-smi-devel
+BuildRequires:  roctracer-devel
+
+%if 0%{?suse_version}
+BuildRequires:  cblas-devel
+BuildRequires:  gcc-fortran
+BuildRequires:  gtest
+%else
+BuildRequires:  gtest-devel
+%endif
+
+%endif
+
+Add this line to install the test dependencies
+
+RUN zypper -n install \
+ blas-devel \
+ libomp-devel \
+ python311-PyYAML \
+ python312-PyYAML \
+ python313-PyYAML \
+ rocminfo \
+ rocm-smi-devel \
+ roctracer-devel \
+ cblas-devel \
+ gcc-fortran \
+ gtest \
+
+The tricky part is translating this
+
+BuildRequires:  python3dist(pyyaml)
+
+Do this
+> zypper search pyyaml
+
+S  | Name                     | Summary                                                               | Type
+---+--------------------------+-----------------------------------------------------------------------+--------
+i  | python311-PyYAML         | YAML parser and emitter for Python                                    | package
+   | python311-pyyaml_env_tag | A custom YAML tag for referencing environment variables in YAML files | package
+   | python311-types-PyYAML   | Typing stubs for PyYAML                                               | package
+i  | python312-PyYAML         | YAML parser and emitter for Python                                    | package
+   | python312-pyyaml_env_tag | A custom YAML tag for referencing environment variables in YAML files | package
+   | python312-types-PyYAML   | Typing stubs for PyYAML                                               | package
+i  | python313-PyYAML         | YAML parser and emitter for Python                                    | package
+   | python313-pyyaml_env_tag | A custom YAML tag for referencing environment variables in YAML files | package
+   | python313-types-PyYAML   | Typing stubs for PyYAML                                               | package
+
+To find the likely packages to install.
+
+Now build the tests, change
+
+RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
+
+to
+
+RUN rpmbuild -ba --with test ~/rpmbuild/SPECS/*.spec
+
+Then install the rpms that where just built, add this line
+
+RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+
+Finally, change the CMD at the bottom to run the tests
+
+CMD ["rocblas-test"]
 
 
 
