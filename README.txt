@@ -26,3 +26,23 @@ Failed to get user name to check for video group membership
 cs10
 docker pull quay.io/centos/centos:stream10
 docker run -it quay.io/centos/centos:stream9 /bin/bash 
+
+Examples of uses
+
+1. Test rocfft on OpenSUSE
+
+Go to the OpenSUSE check dir for librocfft0
+
+> cd opensuse/tumbleweed/librocfft0/check
+
+Build the container as root
+
+# docker build -t test .
+
+On a machine with a AMD GPU, run the container
+
+# docker run --device /dev/kfd --device /dev/dri -it --rm test
+
+
+
+
