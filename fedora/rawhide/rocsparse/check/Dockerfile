@@ -24,4 +24,8 @@ RUN rpmbuild -ba --with test rocsparse/rocsparse.spec
 
 RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
 
-CMD ["rocsparse-test"]
+# CMD ["rocsparse-test"]
+
+RUN dnf install -y gdb
+
+CMD ["gdb", "rocsparse-test"]
