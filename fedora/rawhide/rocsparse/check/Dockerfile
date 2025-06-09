@@ -26,6 +26,20 @@ RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 # CMD ["rocsparse-test"]
 
-RUN dnf install -y gdb
+RUN dnf --enablerepo='*debug*' install -y \
+ gdb \
+ gtest-debuginfo \
+ rocm-hip-debuginfo \
+ libstdc++-debuginfo \
+ glibc-debuginfo \
+ libgcc-debuginfo \
+ rocblas-debuginfo \
+ rocm-runtime-debuginfo \
+ numactl-libs-debuginfo \
+ libdrm-debuginfo \
+ elfutils-libelf-debuginfo \
+ zlib-ng-compat-debuginfo \
+ libzstd-debuginfo \
+ rocm-comgr-debuginfo
 
 CMD ["gdb", "rocsparse-test"]
