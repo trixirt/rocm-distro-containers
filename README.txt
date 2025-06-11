@@ -22,6 +22,10 @@ https://developer.fedoraproject.org/tools/docker/docker-installation.html
 OpenSUSE
 https://www.suse.com/c/rancher_blog/introduction-to-using-docker/
 
+Ubuntu
+https://docs.docker.com/engine/install/ubuntu/
+# apt-get install docker.io
+
 ---
 Trouble shooting
 
@@ -279,5 +283,10 @@ https://rocm.docs.amd.com/projects/HIP/en/docs-6.0.0/how_to_guides/debugging.htm
 
 Pass -e HIP_VISIBLE_DEVICES=<num> in the docker run
 
+4. Rebuild a just-built container
 
+Docker caches most of the steps, it is necessary to clean the cache and
+remove the image to rebuild the image.
 
+$ docker builder prune -a
+$ docker rmi b
