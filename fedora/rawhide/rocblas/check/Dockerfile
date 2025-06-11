@@ -12,7 +12,7 @@ RUN dnf install -y \
 RUN dnf install -y \
  blas-devel \
  libomp-devel \
- python3-pyyaml \ 
+ python3-pyyaml \
  rocminfo \
  rocm-smi-devel \
  roctracer-devel \
@@ -26,4 +26,24 @@ RUN rpmbuild -ba --with test rocblas/rocblas.spec
 
 RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
 
-CMD ["rocblas-test"]
+# CMD ["rocblas-test"]
+
+RUN dnf --enablerepo='*debug*' install -y \
+ gdb \
+ rocm-smi-debuginfo \
+ glibc-debuginfo \
+ rocm-hip-debuginfo \
+ gtest-debuginfo \
+ libstdc++-debuginfo \
+ libgcc-debuginfo \
+ rocm-runtime-debuginfo \
+ numactl-libs-debuginfo \
+ libgfortran-debuginfo \
+ libdrm-debuginfo \
+ elfutils-libelf-debuginfo \
+ zlib-ng-compat-debuginfo \
+ libzstd-debuginfo \
+ rocm-comgr-debuginfo
+
+CMD ["gdb", "rocblas-test"]
+
