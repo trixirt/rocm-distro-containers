@@ -24,4 +24,24 @@ RUN rpmbuild -ba --with test rocsolver/rocsolver.spec
 
 RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
 
-CMD ["rocsolver-test"]
+# CMD ["rocsolver-test"]
+
+RUN dnf --enablerepo='*debug*' install -y \
+ gdb \
+ glibc-debuginfo \
+ rocblas-debuginfo \
+ gtest-debuginfo \
+ fmt-debuginfo \
+ rocm-hip-debuginfo \
+ libgfortran-debuginfo \
+ libstdc++-debuginfo \
+ libgcc-debuginfo \
+ rocm-runtime-debuginfo \
+ numactl-libs-debuginfo \
+ libdrm-debuginfo \
+ elfutils-libelf-debuginfo \
+ zlib-ng-compat-debuginfo \
+ libzstd-debuginfo \
+ rocm-comgr-debuginfo
+
+CMD ["gdb", "rocsolver-test"]
