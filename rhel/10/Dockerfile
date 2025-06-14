@@ -8,6 +8,9 @@ RUN dnf install -y \
  rpmdevtools \
  emacs
 
+RUN dnf install -y \
+ https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 
+RUN dnf update -y
 
 CMD ["bash"]
