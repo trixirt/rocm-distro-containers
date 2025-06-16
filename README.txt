@@ -290,3 +290,27 @@ remove the image to rebuild the image.
 
 $ docker builder prune -a
 $ docker rmi b
+
+5. Where are the SUSE ROCm packages ?
+
+The SUSE packages are produced by OBS, this is the project link
+https://build.opensuse.org/project/show/science:GPU:ROCm
+
+To find the repo location for the binaries, look at the 'Build Results'
+for the SUSE version closest to what you are building or testing.
+
+ex/ 15.6, click 15.6 and you are taken to this page
+https://build.opensuse.org/project/repository_state/science:GPU:ROCm/15.6
+
+Look for the link 'Go to download repository'
+https://download.opensuse.org/repositories/science:/GPU:/ROCm/15.6/
+
+It is necessary to add this repo so the ROCm packages can be found by
+zypper.  An example of the use is
+
+https://github.com/trixirt/rocm-distro-containers/blob/main/suse/15.6/amdsmi/check/Dockerfile
+
+This line shows how to add the repo.
+RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/15.6/ rocm
+For other versions of SUSE, replace https://* with the specific version that is required.
+
