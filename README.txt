@@ -314,3 +314,28 @@ This line shows how to add the repo.
 RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/15.6/ rocm
 For other versions of SUSE, replace https://* with the specific version that is required.
 
+6. Using copr/side-tag Fedora/EPEL repos
+
+It is sometimes necessary to add third party or you own repos to the normal
+set.  This is a common when you are using either a COPR or a side-tag. Then
+general form to add a repo is
+
+RUN dnf config-manager --add-repo <URL>
+
+With an example of adding a side-tag repo
+
+RUN dnf config-manager --add-repo https://kojipkgs.fedoraproject.org/repos/epel10.1-build-side-113908/latest/x86_64/
+
+When later using the added repo you have an error like
+
+...
+
+38.45 Package rocm-runtime-6.4.1-1.el10_1.x86_64.rpm is not signed
+38.45 Package rocm-runtime-devel-6.4.1-1.el10_1.x86_64.rpm is not signed
+38.45 The downloaded packages were saved in cache until the next successful transaction.
+38.45 You can remove cached packages by executing 'dnf clean packages'.
+38.47 Error: GPG check FAILED
+
+Add the option --nogpgcheck to the dnf usage.  An example is
+
+RUN dnf --nogpgcheck -y builddep rocfft/rocfft.spec
