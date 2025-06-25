@@ -2,6 +2,7 @@ FROM opensuse/tumbleweed
 
 RUN zypper -n install \
  git \
+ git-lfs \
  rpmbuild \
  rpmdevtools \
  rpmlint
@@ -9,8 +10,11 @@ RUN zypper -n install \
 RUN rpmdev-setuptree
 
 RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
-RUN zypper -n si librocrand1
 RUN zypper -n si -d librocrand1
-RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
+
+RUN git clone https://src.opensuse.org/ROCm/rocrand.git
+RUN cd rocrand; git lfs pull
+RUN cp -r rocrand/* ~/rpmbuild/SOURCES
+RUN cd rocrand; rpmbuild -ba rocrand.spec
 
 CMD ["bash"]

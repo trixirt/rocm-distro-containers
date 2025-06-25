@@ -2,6 +2,7 @@ FROM opensuse/tumbleweed
 
 RUN zypper -n install \
  git \
+ git-lfs \
  rpmbuild \
  rpmdevtools \
  rpmlint
@@ -9,8 +10,11 @@ RUN zypper -n install \
 RUN rpmdev-setuptree
 
 RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
-RUN zypper -n si rocm-smi
 RUN zypper -n si -d rocm-smi
-RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
+
+RUN git clone https://src.opensuse.org/ROCm/rocm-smi.git
+RUN cd rocm-smi; git lfs pull
+RUN cp -r rocm-smi/* ~/rpmbuild/SOURCES
+RUN cd rocm-smi; rpmbuild -ba rocm-smi.spec
 
 CMD ["bash"]
