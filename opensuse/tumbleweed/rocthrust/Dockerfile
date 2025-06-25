@@ -2,6 +2,7 @@ FROM opensuse/tumbleweed
 
 RUN zypper -n install \
  git \
+ git-lfs \
  rpmbuild \
  rpmdevtools \
  rpmlint
@@ -9,8 +10,11 @@ RUN zypper -n install \
 RUN rpmdev-setuptree
 
 RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
-RUN zypper -n si rocthrust
 RUN zypper -n si -d rocthrust
-RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
+RUN git clone https://src.opensuse.org/ROCm/rocthrust.git
+RUN cd rocthrust; git lfs pull
+RUN cp -r rocthrust/* ~/rpmbuild/SOURCES
+RUN cd rocthrust; rpmbuild -ba rocthrust.spec
+
 
 CMD ["bash"]
