@@ -12,7 +12,7 @@ RUN dnf install -y \
 RUN git clone https://src.fedoraproject.org/rpms/rocclr.git
 RUN dnf -y builddep rocclr/rocclr.spec
 RUN spectool -g -R rocclr/rocclr.spec
-RUN cp rocclr/* ~/rpmbuild/SOURCES
+RUN cp -r rocclr/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocclr/rocclr.spec
 
 CMD ["bash"]
