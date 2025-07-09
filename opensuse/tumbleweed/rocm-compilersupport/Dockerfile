@@ -5,12 +5,19 @@ RUN zypper -n install \
  git-lfs \
  rpmbuild \
  rpmdevtools \
- rpmlint
+ rpmlint \
+ cmake \
+ gcc-c++ \
+ binutils-devel \
+ fdupes \
+ libffi-devel \
+ libzstd-devel \
+ zlib-devel
 
 RUN rpmdev-setuptree
 
 RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
-RUN zypper -n si -d rocm-compilersupport
+RUN zypper -n install rocm-cmake
 RUN git clone https://src.opensuse.org/ROCm/rocm-compilersupport.git
 RUN cd rocm-compilersupport; git lfs pull
 RUN cp -r rocm-compilersupport/* ~/rpmbuild/SOURCES
