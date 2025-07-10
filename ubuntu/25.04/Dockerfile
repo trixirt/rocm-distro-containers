@@ -1,10 +1,10 @@
 FROM ubuntu:25.04
 
-CMD apt-update
-CMD apt install adduser apt-file emacs git openssh-server build-essential cmake ninja-build apt-file python3 ccache
+RUN sed -i -e 's@Types: deb@Types: deb deb-src@' /etc/apt/sources.list.d/ubuntu.sources
+# Installing git-buildpackage will fail without this
+RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 
-CMD apt-file update
-CMD ccache -M 64G
+RUN apt update
+RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-CMD service ssh restart
 CMD ["bash"]
