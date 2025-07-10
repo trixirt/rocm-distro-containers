@@ -12,7 +12,7 @@ RUN dnf install -y \
 RUN git clone https://src.fedoraproject.org/rpms/rocsparse.git
 RUN dnf -y builddep rocsparse/rocsparse.spec
 RUN spectool -g -R rocsparse/rocsparse.spec
-RUN cp rocsparse/* ~/rpmbuild/SOURCES
+RUN cp -r rocsparse/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocsparse/rocsparse.spec
 
 CMD ["bash"]

@@ -12,7 +12,7 @@ RUN dnf install -y \
 RUN git clone https://src.fedoraproject.org/rpms/rocm-compilersupport.git
 RUN dnf -y builddep rocm-compilersupport/rocm-compilersupport.spec
 RUN spectool -g -R rocm-compilersupport/rocm-compilersupport.spec
-RUN cp rocm-compilersupport/* ~/rpmbuild/SOURCES
+RUN cp -r rocm-compilersupport/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocm-compilersupport/rocm-compilersupport.spec
 
 CMD ["bash"]
