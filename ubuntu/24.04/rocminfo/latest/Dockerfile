@@ -7,10 +7,19 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-llvm.git
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocminfo.git
 
-RUN cd rocm-llvm; apt build-dep -y .
-RUN cd rocm-llvm; debian/do_build.sh
+COPY l.tar  /
+RUN tar xf l.tar
+
+# libhsa dependencies
+RUN apt-get install -y libdrm-amdgpu1 libdrm2 libelf1t64 libnuma1
+
+RUN dpkg -i libhsa-runtime64-1_*
+RUN dpkg -i libhsa-runtime-dev_*
+
+RUN cd rocminfo; apt build-dep -y .
+RUN cd rocminfo; debian/do_build.sh
 
 RUN cd b; tar cf /b.tar *.deb
 
