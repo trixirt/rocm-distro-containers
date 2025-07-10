@@ -339,3 +339,58 @@ When later using the added repo you have an error like
 Add the option --nogpgcheck to the dnf usage.  An example is
 
 RUN dnf --nogpgcheck -y builddep rocfft/rocfft.spec
+
+6. Debian/Ubuntu build order
+
+rocm-llvm
+rocr-runtime
+rocminfo
+rocm-hipamd
+rocrand
+
+7. Fedora/RHEL build order
+
+python-tensile
+rocm-cmake
+rocm-compilersupport
+rocm-smi
+amdsmi
+rocm-runtime
+rocminfo
+half
+rocm-rpm-macros
+rocclr
+rocrand
+rocfft
+roctracer
+rocblas
+rocm-core
+hipify
+rccl
+rocprim
+rocthrust
+hipcub
+rocsparse
+rocsolver
+rocalution
+hiprand
+hipfft
+hipblas-common
+hipblas
+hipsparse
+rocdecode
+rocjpeg
+hipsolver
+fplus
+frugally-deep
+miopen
+rocm-omp
+rocwmma
+hipblaslt
+hipsparselt
+rocm-examples
+hipfort
+rocm-rpp
+mivisionx
+rocal
+
