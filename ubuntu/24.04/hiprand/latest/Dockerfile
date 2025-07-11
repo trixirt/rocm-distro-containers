@@ -7,7 +7,8 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-RUN git clone -b debian/latest https://salsa.debian.org/trix/rocrand.git
+RUN mkdir b
+RUN cd b; gbp clone https://salsa.debian.org/rocm-team/hiprand
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -34,9 +35,8 @@ RUN dpkg -i llvm-rocm-dev_*
 RUN dpkg -i llvm-rocm-dev_*
 RUN dpkg -i rocm-device-libs_*
 RUN dpkg -i lld-rocm_*
-RUN dpkg -i libamd-comgr3_*
-RUN dpkg -i libamd-comgr-dev_*
-RUN dpkg -i libamd-comgr-dev_*
+RUN dpkg -i libamd-comgr3_*.deb
+RUN dpkg -i libamd-comgr-dev_*.deb
 
 # libhsa dependencies
 RUN apt-get install -y libdrm-amdgpu1 libdrm2 libelf1t64 libnuma1
@@ -50,6 +50,10 @@ RUN dpkg -i libhiprtc-builtins6_*
 RUN dpkg -i libamdhip64-6_*
 RUN dpkg -i libamdhip64-dev_*
 
+# rocrand
+RUN dpkg -i librocrand1_*
+RUN dpkg -i librocrand-dev_*
+
 # rocminfo dependencies
 RUN apt-get install -y pciutils kmod
 RUN dpkg -i rocminfo_*
@@ -61,8 +65,8 @@ RUN dpkg -i hipcc_*
 RUN dpkg -i rocm-cmake_*
 
 # Not building the docs
-RUN cd rocrand; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
-RUN cd rocrand; debian/do_build.sh
+RUN cd b/hiprand; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
+RUN cd b/hiprand; DEB_BUILD_PROFILES="nodoc nocheck" gbp buildpackage -us -uc
 
 RUN cd b; tar cf /b.tar *.deb
 
