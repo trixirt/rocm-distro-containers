@@ -1,0 +1,26 @@
+#!/bin/sh
+
+HERE=`dirname $0`
+HERE=`realpath $HERE`
+PKG=${HERE}/../../latest
+mkdir -p ${PKG}
+
+cd ../../latest
+tar cf ${HERE}/l.tar *.deb
+cd -
+
+sudo docker build -t u .
+sudo docker run u
+
+ID=`sudo docker ps -alq`
+
+TMP=`mktemp -d`
+sudo docker cp ${ID}:/b.tar ${TMP}/
+
+cd ${TMP}
+tar xf b.tar
+cp *.deb ${PKG}/
+cd -
+
+rm -rf ${TMP}
+
