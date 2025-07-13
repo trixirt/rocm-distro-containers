@@ -342,11 +342,29 @@ RUN dnf --nogpgcheck -y builddep rocfft/rocfft.spec
 
 6. Debian/Ubuntu build order
 
+rocm-cmake
 rocm-llvm
 rocr-runtime
 rocminfo
 rocm-hipamd
+pkg-rocm-tools
 rocrand
+hiprand
+rocfft
+hipfft
+roctracer
+rocblas
+rocprim
+rocthrust
+hipcub
+rocsparse
+hipsparse
+rocalution
+hipblas-common
+rocsolver
+hipblas
+hipsolver
+
 
 7. Fedora/RHEL build order
 
