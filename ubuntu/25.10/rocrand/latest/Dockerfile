@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 RUN sed -i -e 's@Types: deb@Types: deb deb-src@' /etc/apt/sources.list.d/ubuntu.sources
 # Installing git-buildpackage will fail without this
@@ -8,7 +8,7 @@ RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
 RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
-RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-hipamd.git
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocrand.git
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -35,8 +35,9 @@ RUN dpkg -i llvm-rocm-dev_*
 RUN dpkg -i llvm-rocm-dev_*
 RUN dpkg -i rocm-device-libs_*
 RUN dpkg -i lld-rocm_*
-RUN dpkg -i libamd-comgr3_*.deb
-RUN dpkg -i libamd-comgr-dev_*.deb
+RUN dpkg -i libamd-comgr3_*
+RUN dpkg -i libamd-comgr-dev_*
+RUN dpkg -i libamd-comgr-dev_*
 
 # libhsa dependencies
 RUN apt-get install -y libdrm-amdgpu1 libdrm2 libelf1t64 libnuma1
@@ -44,9 +45,25 @@ RUN apt-get install -y libdrm-amdgpu1 libdrm2 libelf1t64 libnuma1
 RUN dpkg -i libhsa-runtime64-1_*
 RUN dpkg -i libhsa-runtime-dev_*
 
+# rocm-hipamd
+RUN dpkg -i libhiprtc6_*
+RUN dpkg -i libhiprtc-builtins6_*
+RUN dpkg -i libamdhip64-6_*
+RUN dpkg -i libamdhip64-dev_*
 
-RUN cd rocm-hipamd; apt build-dep -y .
-RUN rocm-build-scripts/build.sh rocm-hipamd
+# rocminfo dependencies
+RUN apt-get install -y pciutils kmod
+RUN dpkg -i rocminfo_*
+
+# hipcc
+RUN dpkg -i hipcc_*
+
+# rocm-cmake
+RUN dpkg -i rocm-cmake_*
+
+# Not building the docs
+RUN cd rocrand; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
+RUN DEB_BUILD_PROFILES="nodoc nocheck" rocm-build-scripts/build.sh rocrand
 
 RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
 

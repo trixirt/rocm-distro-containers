@@ -7,6 +7,7 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update --fix-missing
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
 RUN git clone -b debian/latest https://salsa.debian.org/trix/rocr-runtime.git
 
 COPY l.tar  /
@@ -39,8 +40,8 @@ RUN dpkg -i rocm-device-libs_*
 RUN dpkg -i lld-rocm_*
 
 RUN cd rocr-runtime; apt build-dep -y .
-RUN cd rocr-runtime; debian/do_build.sh
+RUN rocm-build-scripts/build.sh rocr-runtime
 
-RUN cd b; tar cf /b.tar *.deb
+RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
 
 CMD ["bash"]

@@ -7,11 +7,18 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
 RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-llvm.git
 
-RUN cd rocm-llvm; apt build-dep -y .
-RUN cd rocm-llvm; debian/do_build.sh
+COPY l.tar  /
+RUN tar xf l.tar
 
-RUN cd b; tar cf /b.tar *.deb
+# rocm-cmake
+RUN dpkg -i rocm-cmake_*
+
+RUN cd rocm-llvm; apt build-dep -y .
+RUN rocm-build-scripts/build.sh rocm-llvm
+
+RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
 
 CMD ["bash"]

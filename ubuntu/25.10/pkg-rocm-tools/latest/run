@@ -5,10 +5,6 @@ HERE=`realpath $HERE`
 PKG=${HERE}/../../latest
 mkdir -p ${PKG}
 
-cd ../../latest
-tar cf ${HERE}/l.tar *.deb
-cd -
-
 sudo docker build -t u .
 sudo docker run u
 
