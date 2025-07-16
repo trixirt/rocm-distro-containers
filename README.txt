@@ -29,6 +29,7 @@ https://docs.docker.com/engine/install/ubuntu/
 ---
 Trouble shooting
 
+----
 Using /dev/kfd
 [root@3ff4ca99a474 test]# rocminfo
 ROCk module is loaded
@@ -36,6 +37,17 @@ Unable to open /dev/kfd read-write: No such file or directory
 Failed to get user name to check for video group membership
 
 Likely need to pass the --device /dev/kfd --device /dev/dri
+
+----
+Permission for using chroots
+
+debian/ubuntu :
+root@c4384c2d0119:/# schroot -c <your chroot>
+E: 10mount: mount: /run/schroot/mount/<your chroot ...>: permission denied.
+E: 10mount:        dmesg(1) may have more information after failed mount system call.
+E: <your chroot ...>: Chroot setup failed: stage=setup-start
+
+Likely need to pass --privileged to the docker run command
 
 ---
 Starting distro images
@@ -343,6 +355,8 @@ RUN dnf --nogpgcheck -y builddep rocfft/rocfft.spec
 6. Debian/Ubuntu build order
 
 rocm-cmake
+rocm-smi-lib
+amdsmi
 rocm-llvm
 rocr-runtime
 rocminfo

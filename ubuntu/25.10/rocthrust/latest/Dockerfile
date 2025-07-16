@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 RUN sed -i -e 's@Types: deb@Types: deb deb-src@' /etc/apt/sources.list.d/ubuntu.sources
 # Installing git-buildpackage will fail without this
@@ -7,8 +7,8 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
-RUN git clone -b debian/latest https://salsa.debian.org/trix/rocrand.git
+RUN mkdir b
+RUN cd b; gbp clone https://salsa.debian.org/rocm-team/rocthrust
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -35,9 +35,8 @@ RUN dpkg -i llvm-rocm-dev_*
 RUN dpkg -i llvm-rocm-dev_*
 RUN dpkg -i rocm-device-libs_*
 RUN dpkg -i lld-rocm_*
-RUN dpkg -i libamd-comgr3_*
-RUN dpkg -i libamd-comgr-dev_*
-RUN dpkg -i libamd-comgr-dev_*
+RUN dpkg -i libamd-comgr3_*.deb
+RUN dpkg -i libamd-comgr-dev_*.deb
 
 # libhsa dependencies
 RUN apt-get install -y libdrm-amdgpu1 libdrm2 libelf1t64 libnuma1
@@ -61,10 +60,14 @@ RUN dpkg -i hipcc_*
 # rocm-cmake
 RUN dpkg -i rocm-cmake_*
 
-# Not building the docs
-RUN cd rocrand; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
-RUN DEB_BUILD_PROFILES="nodoc nocheck" rocm-build-scripts/build.sh rocrand
+# rocprim
+RUN dpkg -i librocprim-dev_*
 
-RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
+# Not building the docs
+# Problems building tests
+RUN cd b/rocthrust; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
+RUN cd b/rocthrust; DEB_BUILD_PROFILES="nodoc nocheck" gbp buildpackage -us -uc
+
+RUN cd b; tar cf /b.tar *.deb
 
 CMD ["bash"]
