@@ -7,8 +7,8 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-RUN mkdir b
-RUN cd b; gbp clone https://salsa.debian.org/rocm-team/hiprand
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
+RUN git clone -b debian/latest https://salsa.debian.org/trix/hiprand.git
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -65,9 +65,9 @@ RUN dpkg -i hipcc_*
 RUN dpkg -i rocm-cmake_*
 
 # Not building the docs
-RUN cd b/hiprand; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
-RUN cd b/hiprand; DEB_BUILD_PROFILES="nodoc nocheck" gbp buildpackage -us -uc
+RUN cd hiprand; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
+RUN DEB_BUILD_PROFILES="nodoc nocheck" rocm-build-scripts/build.sh hiprand
 
-RUN cd b; tar cf /b.tar *.deb
+RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
 
 CMD ["bash"]
