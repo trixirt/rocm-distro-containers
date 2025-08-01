@@ -7,8 +7,8 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-RUN mkdir b
-RUN cd b; gbp clone https://salsa.debian.org/rocm-team/hipsparse
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
+RUN git clone -b debian/latest https://salsa.debian.org/trix/hipsparse.git
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -71,9 +71,10 @@ RUN dpkg -i librocsparse1_*
 RUN dpkg -i librocsparse-dev_*
 
 # Not building the docs
-RUN cd b/hipsparse; DEB_BUILD_PROFILES="nodoc" apt build-dep -y .
-RUN cd b/hipsparse; DEB_BUILD_PROFILES="nodoc" gbp buildpackage -us -uc
+RUN cd hipsparse; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
+RUN DEB_BUILD_PROFILES="nodoc nocheck" rocm-build-scripts/build.sh hipsparse
 
-RUN cd b; tar cf /b.tar *.deb
+RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
+
 
 CMD ["bash"]

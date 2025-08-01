@@ -7,8 +7,8 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
-RUN mkdir b
-RUN cd b; gbp clone https://salsa.debian.org/rocm-team/rocsparse
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocsparse.git
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -66,11 +66,10 @@ RUN dpkg -i pkg-rocm-tools_*
 # rocprim
 RUN dpkg -i librocprim-dev_*
 
-
 # Not building the docs
-RUN cd b/rocsparse; DEB_BUILD_PROFILES="nodoc" apt build-dep -y .
-RUN cd b/rocsparse; DEB_BUILD_PROFILES="nodoc" gbp buildpackage -us -uc
+RUN cd rocsparse; DEB_BUILD_PROFILES="nodoc nocheck" apt build-dep -y .
+RUN DEB_BUILD_PROFILES="nodoc nocheck" rocm-build-scripts/build.sh rocsparse
 
-RUN cd b; tar cf /b.tar *.deb
+RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
 
 CMD ["bash"]

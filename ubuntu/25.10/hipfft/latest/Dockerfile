@@ -8,7 +8,7 @@ RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
 RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
-RUN git clone -b debian/experimental https://salsa.debian.org/rocm-team/hipfft
+RUN git clone -b debian/latest https://salsa.debian.org/trix/hipfft
 
 COPY l.tar  /
 RUN tar xf l.tar
