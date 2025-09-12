@@ -9,8 +9,8 @@ RUN zypper -n install \
 RUN rpmdev-setuptree
 
 RUN zypper ar -G -f https://download.opensuse.org/repositories/science:/GPU:/ROCm/openSUSE_Tumbleweed/ rocm
-RUN zypper -n si rocalution
-RUN zypper -n si -d rocalution
+RUN zypper -n si librocalution1
+RUN zypper -n si -d librocalution1
 RUN rpmbuild -ba ~/rpmbuild/SPECS/*.spec
 
 CMD ["bash"]

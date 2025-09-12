@@ -1,0 +1,18 @@
+FROM fedora:43
+
+RUN dnf update -y
+
+RUN dnf install -y \
+ fedora-review \
+ git \
+ rpm-build \
+ rpmdevtools \
+ rpmlint
+
+RUN git clone https://src.fedoraproject.org/rpms/rocminfo.git
+RUN dnf -y builddep rocminfo/rocminfo.spec
+RUN spectool -g -R rocminfo/rocminfo.spec
+RUN cp rocminfo/* ~/rpmbuild/SOURCES
+RUN rpmbuild -ba rocminfo/rocminfo.spec
+
+CMD ["bash"]
