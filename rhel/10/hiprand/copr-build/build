@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cp ../../../../scripts/check-warnings.sh .
+docker build -t $1 .
