@@ -33,6 +33,9 @@ RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
 # Other test depends
 RUN dnf install -y gtest-devel python3-pyyaml
 # Now the build
-RUN rpmbuild --with test -ba hipblas/hipblas.spec
+RUN rpmbuild --with test -ba hipblas/hipblas.spec 2>&1 | tee build.log
+
+COPY check-warnings.sh check-warnings.sh
+RUN ./check-warnings.sh build.log 2>&1 | tee warnings.log
 
 CMD ["bash"]
