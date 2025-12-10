@@ -8,7 +8,7 @@ RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild
 
 RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-build-scripts.git
-RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-llvm.git
+RUN git clone -b debian/latest https://salsa.debian.org/trix/rocm-llvm.git llvm-toolchain-rocm
 
 COPY l.tar  /
 RUN tar xf l.tar
@@ -16,8 +16,8 @@ RUN tar xf l.tar
 # rocm-cmake
 RUN dpkg -i rocm-cmake_*
 
-RUN cd rocm-llvm; apt build-dep -y .
-RUN rocm-build-scripts/build.sh rocm-llvm
+RUN cd llvm-toolchain-rocm; apt build-dep -y .
+RUN rocm-build-scripts/build.sh llvm-toolchain-rocm
 
 RUN cd rocm-build-scripts/b; tar cf /b.tar *.deb
 
