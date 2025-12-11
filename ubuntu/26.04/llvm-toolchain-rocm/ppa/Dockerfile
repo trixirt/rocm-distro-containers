@@ -9,9 +9,9 @@ RUN apt install -y build-essential devscripts git git-buildpackage sbuild softwa
 
 RUN add-apt-repository -y ppa:bullwinkle-team/rocm-devel
 
-RUN git clone -b bullwinkle/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/rocminfo
+RUN git clone -b bullwinkle/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/llvm-toolchain-rocm
 
-WORKDIR /rocminfo
+WORKDIR /llvm-toolchain-rocm
 
 RUN apt-get build-dep . -y
 # retry every 120 sec +- 60 sec for 10 times
