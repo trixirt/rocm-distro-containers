@@ -1,19 +1,4 @@
 #!/bin/sh
 
-f=`realpath $1`
-mv .git /tmp
-mv debian /tmp
-rm -rf *
-rm -rf .*
-here=$PWD
-
-rm -rf /tmp/a
-mkdir /tmp/a
-cd /tmp/a
-tar xf $f
-for d in `ls`; do
-    cp -rp $d/* $here/
-done
-
-mv /tmp/.git $here/
-mv /tmp/debian $here/
+git branch upstream/latest
+gbp import-orig --uscan --pristine-tar --debian-branch=bullwinkle/ubuntu/devel --upstream-version=7.1.0
