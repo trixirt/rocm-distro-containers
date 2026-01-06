@@ -9,21 +9,23 @@ RUN dnf install -y \
  rpmdevtools \
  rpmlint
 
+#
+# Problem for rawhide gtest 1.17.0, fallback to f43
+RUN git clone -b f43 https://src.fedoraproject.org/rpms/gtest.git
+RUN dnf -y builddep gtest/gtest.spec
+RUN spectool -g -R gtest/gtest.spec
+RUN cp -r gtest/* ~/rpmbuild/SOURCES
+RUN rpmbuild -ba gtest/gtest.spec
+RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+
 RUN git clone https://src.fedoraproject.org/rpms/rocfft.git
-RUN dnf -y builddep rocfft/rocfft.spec
+RUN dnf -y builddep --with test rocfft/rocfft.spec
 RUN spectool -g -R rocfft/rocfft.spec
 RUN cp rocfft/* ~/rpmbuild/SOURCES
 
-RUN dnf install -y \
- rocrand-devel \
- fftw-devel \
- boost-devel \
- hipcc-libomp-devel \
- hiprand-devel \
- gtest-devel
-
 RUN rpmbuild -ba --with test rocfft/rocfft.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN dnf -y install ~/rpmbuild/RPMS/x86_64/rocfft-*
 
-CMD ["rocfft-test"]
+# CMD ["rocfft-test"]
+CMD ["bash"]
