@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker run -p 8080:8080 -p 8022:22 --device /dev/kfd --device /dev/dri -it --rm $1
