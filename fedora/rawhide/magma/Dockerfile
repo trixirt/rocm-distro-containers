@@ -13,6 +13,6 @@ RUN git clone https://src.fedoraproject.org/rpms/magma.git
 RUN dnf -y builddep magma/magma.spec
 RUN spectool -g -R magma/magma.spec
 RUN cp magma/* ~/rpmbuild/SOURCES
-RUN rpmbuild -ba magma/magma.spec
+# RUN rpmbuild -ba magma/magma.spec
 
 CMD ["bash"]

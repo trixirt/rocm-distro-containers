@@ -13,6 +13,9 @@ RUN git clone https://src.fedoraproject.org/rpms/kokkos.git
 RUN dnf -y builddep kokkos/kokkos.spec
 RUN spectool -g -R kokkos/kokkos.spec
 RUN cp kokkos/* ~/rpmbuild/SOURCES
-RUN rpmbuild -ba kokkos/kokkos.spec
+#
+# Module do not run well in containers, do this by hand
+# RUN rpmbuild -ba --with rocm_test kokkos/kokkos.spec
+# expects to be run on gfx1100
 
 CMD ["bash"]
