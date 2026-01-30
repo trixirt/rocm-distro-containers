@@ -9,7 +9,7 @@ RUN apt install -y build-essential devscripts git git-buildpackage sbuild softwa
 
 RUN add-apt-repository -y ppa:bullwinkle-team/rocm-devel
 
-RUN git clone -b bullwinkle/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/hipcub
+RUN git clone -b bullwinkle/llvm-21/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/hipcub
 
 WORKDIR /hipcub
 
