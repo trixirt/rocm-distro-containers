@@ -7,9 +7,11 @@ RUN echo "MIRRORSITE=http://archive.ubuntu.com/ubuntu" > /etc/pbuilderrc
 RUN apt update
 RUN apt install -y build-essential devscripts git git-buildpackage sbuild software-properties-common retry
 
-RUN add-apt-repository -y ppa:bullwinkle-team/rocm-devel-21
+# RUN add-apt-repository -y ppa:bullwinkle-team/rocm-devel-21
+# RUN git clone -b bullwinkle/llvm-21/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/rocprim
 
-RUN git clone -b bullwinkle/llvm-21/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/rocprim
+RUN add-apt-repository -y ppa:bullwinkle-team/rocm-devel
+RUN git clone -b bullwinkle/ubuntu/devel https://git.launchpad.net/~bullwinkle-team/ubuntu/+source/rocprim
 
 WORKDIR /rocprim
 
