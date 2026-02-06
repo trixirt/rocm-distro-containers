@@ -16,6 +16,6 @@ RUN git clone https://gitlab.archlinux.org/archlinux/packaging/packages/rocrand.
 WORKDIR rocrand
 
 RUN sed -i '1a\export ROCM_PATH=/opt/rocm' test.sh
-# CMD ["bash", "test.sh"]
-CMD ["bash"]
+CMD ["bash", "test.sh"]
+# CMD ["bash"]
 
