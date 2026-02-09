@@ -1,0 +1,18 @@
+FROM fedora:f44
+
+RUN dnf update -y
+
+RUN dnf install -y \
+ fedora-review \
+ git \
+ rpm-build \
+ rpmdevtools \
+ rpmlint
+
+RUN git clone -b f44 https://src.fedoraproject.org/rpms/rocsparse.git
+RUN dnf -y builddep rocsparse/rocsparse.spec
+RUN spectool -g -R rocsparse/rocsparse.spec
+RUN cp -r rocsparse/* ~/rpmbuild/SOURCES
+RUN rpmbuild -ba rocsparse/rocsparse.spec
+
+CMD ["bash"]
