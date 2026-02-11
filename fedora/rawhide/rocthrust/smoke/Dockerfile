@@ -10,9 +10,9 @@ RUN dnf install -y \
  rocprim-devel \
  rocthrust-devel
 
-RUN git clone https://gitlab.archlinux.org/archlinux/packaging/packages/rocthrust.git
+RUN git clone https://src.fedoraproject.org/rpms/rocthrust.git
 WORKDIR ./rocthrust
 
-# CMD ["bash", "test.sh"]
-CMD ["bash"]
+CMD ["bash", "test.sh"]
+# CMD ["bash"]
 
