@@ -21,7 +21,7 @@ RUN cp rocminfo/* ~/rpmbuild/SOURCES
 
 RUN rpmbuild -ba --with compat --with test rocminfo/rocminfo.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["/usr/lib64/rocm/rocm-7.1/bin/rocminfo"]
 # CMD ["bash"]

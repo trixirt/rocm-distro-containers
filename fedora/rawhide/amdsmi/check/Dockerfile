@@ -15,6 +15,6 @@ RUN spectool -g -R amdsmi/amdsmi.spec
 RUN cp amdsmi/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba --with test amdsmi/amdsmi.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["/usr/share/amdsmi/tests/amdsmitst"]

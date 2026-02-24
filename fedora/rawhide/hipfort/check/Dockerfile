@@ -17,7 +17,7 @@ RUN rpmbuild -ba hipfort/hipfort.spec
 
 # Need rocminfo
 RUN dnf install -y rocminfo
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/hipfort*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipfort*
 
 CMD ["rpmbuild", "-ba", "--with", "check", "hipfort/hipfort.spec" ]
 # CMD ["bash" ]

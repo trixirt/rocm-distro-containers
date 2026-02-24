@@ -16,7 +16,7 @@ RUN cp aqlprofile/* ~/rpmbuild/SOURCES
 
 RUN rpmbuild -ba --with test aqlprofile/aqlprofile.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["/usr/share/hsa-amd-aqlprofile/run_tests.sh"]
 

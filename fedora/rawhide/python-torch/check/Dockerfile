@@ -13,7 +13,7 @@ RUN dnf install -y \
 RUN dnf download --source \
  python3-torch
 
-RUN rpm -ihv python-torch*.src.rpm
+RUN rpm -ihv --nosignature python-torch*.src.rpm
 RUN dnf -y builddep ~/rpmbuild/SPECS/python-torch.spec
 RUN rpmbuild -bp ~/rpmbuild/SPECS/python-torch.spec
 

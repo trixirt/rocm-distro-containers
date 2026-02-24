@@ -15,6 +15,6 @@ RUN spectool -g -R rocm-smi/rocm-smi.spec
 RUN cp rocm-smi/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba --with test rocm-smi/rocm-smi.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["/usr/share/rsmitst_tests/rsmitst"]

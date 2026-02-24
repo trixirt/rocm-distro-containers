@@ -22,7 +22,7 @@ RUN cp rocjpeg/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocjpeg/rocjpeg.spec
 
 # Need to install the samples
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["rpmbuild", "-ba", "--with", "check", "rocjpeg/rocjpeg.spec"]
 # CMD ["bash"]

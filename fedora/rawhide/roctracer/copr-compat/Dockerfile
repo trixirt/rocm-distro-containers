@@ -21,7 +21,7 @@ RUN cp roctracer/* ~/rpmbuild/SOURCES
 
 RUN rpmbuild -ba --with compat --with test roctracer/roctracer.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["bash"]
 

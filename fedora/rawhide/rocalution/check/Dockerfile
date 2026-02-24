@@ -16,7 +16,7 @@ RUN dnf -y builddep gtest/gtest.spec
 RUN spectool -g -R gtest/gtest.spec
 RUN cp -r gtest/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba gtest/gtest.spec
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 RUN git clone https://src.fedoraproject.org/rpms/rocalution.git
 RUN dnf -y builddep rocalution/rocalution.spec
@@ -25,6 +25,6 @@ RUN cp rocalution/* ~/rpmbuild/SOURCES
 
 RUN rpmbuild -ba --with test rocalution/rocalution.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/roc*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/roc*
 
 CMD ["/usr/bin/rocalution-test"]

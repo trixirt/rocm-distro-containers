@@ -13,7 +13,7 @@ RUN dnf install -y \
 RUN git clone https://src.fedoraproject.org/rpms/ollama.git
 RUN dnf -y builddep ollama/ollama.spec
 RUN cd ollama; fedpkg srpm
-RUN rpm -ihv ollama/*.src.rpm
+RUN rpm -ihv --nosignature ollama/*.src.rpm
 RUN rpmbuild -ba ollama/ollama.spec
 
 CMD ["bash"]

@@ -24,7 +24,7 @@ RUN spectool -g -R rocblas/rocblas.spec
 RUN cp -r rocblas/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba --with test rocblas/rocblas.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["rocblas-bench", "-f", "gemv", "-r", "s", "-m", "10240", "-n", "10240", "--lda", "10240"]
 

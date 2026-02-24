@@ -17,6 +17,6 @@ RUN wget https://mystro256.fedorapeople.org/rocrtst.spec
 RUN dnf -y builddep rocrtst.spec
 RUN rpmbuild -ba rocrtst.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["/usr/bin/rocrtst64"]

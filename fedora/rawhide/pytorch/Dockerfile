@@ -20,7 +20,7 @@ RUN dnf install -y \
 RUN dnf download --source \
  python3-torch
 
-RUN rpm -ihv python-torch*.src.rpm
+RUN rpm -ihv --nosignature python-torch*.src.rpm
 
 
 CMD ["bash"]

@@ -13,7 +13,7 @@ RUN dnf install -y \
 RUN dnf download --source \
  python3-torchvision
 
-RUN rpm -ihv python-torchvision*.src.rpm
+RUN rpm -ihv --nosignature python-torchvision*.src.rpm
 RUN dnf -y builddep ~/rpmbuild/SPECS/python-torchvision.spec
 RUN rpmbuild -bp ~/rpmbuild/SPECS/python-torchvision.spec
 

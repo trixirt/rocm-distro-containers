@@ -21,7 +21,7 @@ RUN dnf -y builddep gtest/gtest.spec
 RUN spectool -g -R gtest/gtest.spec
 RUN cp -r gtest/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba gtest/gtest.spec
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 RUN git clone https://src.fedoraproject.org/rpms/hipsolver.git
 RUN dnf -y builddep hipsolver/hipsolver.spec
@@ -30,6 +30,6 @@ RUN cp hipsolver/* ~/rpmbuild/SOURCES
 
 RUN rpmbuild -ba --with test hipsolver/hipsolver.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/hipsolver*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipsolver*
 
 CMD ["hipsolver-test"]

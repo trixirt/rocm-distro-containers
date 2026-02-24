@@ -23,6 +23,6 @@ RUN dnf install -y \
 
 RUN rpmbuild -ba --with test hipfft/hipfft.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["hipfft-test"]

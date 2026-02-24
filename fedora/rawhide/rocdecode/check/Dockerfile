@@ -22,6 +22,6 @@ RUN spectool -g -R rocdecode/rocdecode.spec
 RUN cp rocdecode/* ~/rpmbuild/SOURCES
 # Need to install the samples first
 RUN rpmbuild -ba rocdecode/rocdecode.spec
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["rpmbuild", "-ba", "--with", "check", "rocdecode/rocdecode.spec" ]

@@ -15,7 +15,7 @@ RUN spectool -g -R rocm-bandwidth-test/rocm-bandwidth-test.spec
 RUN cp -r rocm-bandwidth-test/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocm-bandwidth-test/rocm-bandwidth-test.spec
 
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["rocm-bandwidth-test"]
 
