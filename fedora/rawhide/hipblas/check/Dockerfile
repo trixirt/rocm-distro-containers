@@ -15,7 +15,7 @@ RUN spectool -g -R hipblas/hipblas.spec
 RUN cp hipblas/* ~/rpmbuild/SOURCES
 
 RUN dnf install -y \
- blas-static \
+ blis-devel \
  lapack-static \
  python3-pyyaml
 
@@ -48,6 +48,6 @@ RUN rpmbuild -ba --with test hipblas/hipblas.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipblas*
 
-# CMD ["hipblas-test"]
+CMD ["hipblas-test"]
 
-CMD ["gdb", "hipblas-test"]
+# CMD ["gdb", "hipblas-test"]
