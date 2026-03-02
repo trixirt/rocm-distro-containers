@@ -1,0 +1,246 @@
+#!/bin/sh
+
+# set -x
+
+# Script to build and run a Docker container with configurable options.
+#
+# Command-line options:
+#   -t TAG        :  The tag for the Docker image.
+#                   Can also be set with the environment variable RDC_TAG.
+#   -p A:B        :  The port mapping for the container.
+#                   Can also be set with the environment variable RDC_PORT_MAPPING.
+#   -c NUM        :  The number of CPU cores to allocate to the container (default: maximum cores).
+#                   Can also be set with the environment variable RDC_CPU_CORES.
+#   -v <local>:<remote> : Volume mapping between a local directory and a remote path in the container.
+#                   Multiple -v options can be used.
+#                   Can also be set with the environment variable RDC_VOLUMES, 
+#                   which should be a comma-separated list of volume mappings (e.g., 
+#                     /host/path:/container/path,/another/host/path:/another/container/path).
+#
+
+#
+# Functions
+#
+# Function to validate local path existence
+validate_local_path() {
+  local path="$1"
+  if [ ! -d "$path" ]; then
+    echo "Error: Local path '$path' does not exist or is not a directory." >&2
+    return 1 # Indicate failure
+  fi
+  return 0 # Indicate success
+}
+
+# Function to check if a Docker image tag exists
+docker_tag_exists() {
+    local tag="$1"
+    if [ -z $tag ]; then
+	return 1
+    else
+	docker images --filter "reference=$tag" | grep -q "$tag"
+	return $? # Return the exit status of grep (0 if found, 1 if not)
+    fi
+}
+
+#
+# Enviroment variables and default values
+#
+if [ -n "$RDC_TAG" ]; then
+  TAG="$RDC_TAG"  # Initialize TAG from environment variable if it exists
+else
+  TAG=
+fi
+
+MAX_CORES=$(nproc)
+
+if [ -n "$RDC_CORES" ] && [[ "$RDC_CORES" =~ ^[0-9]+$ ]]; then
+  if (( RDC_CORES <= MAX_CORES )); then
+    CPU_CORES="$RDC_CORES" # Use RDC_CORES if valid and within limits
+  else
+    CPU_CORES="$MAX_CORES"  # Fallback to max cores if RDC_CORES exceeds limit
+    echo "Warning: RDC_CORES exceeds maximum cores ($MAX_CORES). Using maximum cores." >&2
+  fi
+else
+  CPU_CORES="$MAX_CORES"  # Fallback to max cores if RDC_CORES is invalid
+fi
+
+# Load PORT_MAPPING and VOLUMES from environment if they exist and are valid
+if [ -n "$RDC_PORT_MAPPING" ] && [[ "$RDC_PORT_MAPPING" =~ ^[0-9]+:[0-9]+$ ]]; then
+  PORT_MAPPING="$RDC_PORT_MAPPING"
+else
+  PORT_MAPPING=
+fi
+
+if [ -n "$RDC_VOLUMES" ]; then
+  # Split the comma-separated string into an array
+  IFS=',' read -r -a VOLUMES_ARRAY <<< "$RDC_VOLUMES"
+
+  # Validate each volume mapping in the array
+  valid_volumes=()
+  for volume_mapping in "${VOLUMES_ARRAY[@]}"; do
+    IFS=':' read -r local_path remote_path <<< "$volume_mapping"
+    if [ -d "$local_path" ] && [[ "$volume_mapping" =~ ^[0-9a-zA-Z\./_-]+:[0-9a-zA-Z\./_-]+$ ]]; then #added more permissive regex to 
+account for more valid characters
+      valid_volumes+=("$volume_mapping")
+    else
+      echo "Warning: Invalid volume mapping '$volume_mapping' found in RDC_VOLUMES. Skipping." >&2
+    fi
+  done
+  VOLUMES=("${valid_volumes[@]}") # Assign the validated array to VOLUMES
+
+else
+  VOLUMES=()  # Default to empty array if no environment variable
+fi
+
+#
+# Paths
+# Get the current directory
+# Did a directory or a file get passed in ?
+if [ ! -z $1 ];  then
+    if [ ! -d $1 ]; then
+	current_dir=`dirname $1`
+    else
+	current_dir=$1
+    fi
+    current_dir=`realpath $current_dir`
+
+    # Where the logs are
+    log_dir=${current_dir}/log
+    mkdir -p $log_dir
+fi
+
+# The script dir
+script_dir=`dirname $0`
+script_dir=`realpath $script_dir`
+
+# Parse command-line options
+while getopts "c:p:t:v:" opt; do  # Reordered options alphabetically
+  case $opt in
+    c)
+      CPU_CORES_TEMP="$OPTARG"
+      if ! [[ "$CPU_CORES_TEMP" =~ ^[0-9]+$ ]]; then
+        echo "Error: CPU core count must be a number. Using default value: $CPU_CORES" >&2
+      else
+        if (( CPU_CORES_TEMP > CPU_CORES )); then
+          echo "Error: CPU core count cannot exceed the default value: $CPU_CORES. Using default value." >&2
+          CPU_CORES_TEMP="$CPU_CORES" # Reset to default
+        fi
+        CPU_CORES="$CPU_CORES_TEMP"
+      fi
+      ;;
+    p)
+      PORT_MAPPING_TEMP="$OPTARG"
+      if [[ "$PORT_MAPPING_TEMP" =~ ^[0-9]+:[0-9]+$ ]]; then
+        PORT_MAPPING="$PORT_MAPPING_TEMP"
+      else
+        echo "Error: Invalid port mapping format.  Use format: A:B. Using default value: $PORT_MAPPING" >&2
+      fi
+      ;;
+    t)
+      TAG="$OPTARG"
+      ;;
+    v)
+      # Split the volume mapping into local and remote paths
+      IFS=':' read -r local_path remote_path <<< "$OPTARG"
+
+      # Validate the local path
+      if ! validate_local_path "$local_path"; then
+        # Do not exit, skip adding this volume
+        continue
+      fi
+
+      # Add the volume mapping to the array
+      VOLUMES+=("$local_path:$remote_path")
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      echo "Usage: $0 [-c NUM] [-p A:B] [-t TAG] [-v <local path>:<remote path>]" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      echo "Usage: $0 [-c NUM] [-p A:B] [-t TAG] [-v <local path>:<remote path>]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Remove the parsed options from the argument list
+shift $((OPTIND-1))
+
+# Check if the tag exists
+if docker_tag_exists "${TAG}"; then
+  echo "Docker image tag ${TAG} exists."
+  # Add your logic here to use the existing tag
+  echo "Continuing with operations using tag ${TAG} ..."
+
+else
+  echo "Docker image tag ${TAG} does not exist."
+
+  # Check for the tar file in the current directory
+  if [ -f "$current_dir/${TAG}.tar" ]; then
+    echo "Tar file '${TAG}.tar' found.  Loading image..."
+    docker load -i "$current_dir/${TAG}.tar"
+    if [ $? -eq 0 ]; then
+      echo "Image loaded successfully."
+      # Continue with operations now that the image is loaded
+      echo "Continuing with operations using tag ${TAG} ..."
+    else
+      echo "Error: Failed to load image from ${TAG}.tar."
+      echo "Exiting script."
+      exit 1
+    fi
+
+  else
+    echo "Tar file '${TAG}.tar' not found. Building from Dockerfile..."
+
+    # Build the image from Dockerfile
+    if [ ! -z $current_dir ]; then
+	TAG=`$script_dir/build $current_dir | grep TAG: | awk '{ print $2 } '`
+	echo $TAG
+	if [ $? -eq 0 ]; then
+	    echo "Image built successfully."
+	    # Continue with operations now that the image is built
+	    echo "Continuing with operations using tag '${TAG}'..."
+	else
+	    echo "Error: Failed to build image from Dockerfile."
+	    echo "Exiting script."
+	    exit 1
+	fi
+    else
+	echo "Need to pass in a path to the Dockerfile or its directory"
+	exit 1
+    fi
+  fi
+fi
+
+
+# Now you can use the $TAG, $PORT_MAPPING, $CPU_CORES, and $VOLUMES variables within your script.
+echo "Using tag: $TAG"
+echo "Using port mapping: $PORT_MAPPING"
+echo "Using CPU cores: $CPU_CORES"
+echo "Using volumes:"
+for volume in "${VOLUMES[@]}"; do
+    echo "  $volume"
+    V=1
+done
+
+docker_options=
+if [ ! -z $V ];  then
+    docker_options="${docker_options} -v ${VOLUMES[@]}"
+fi
+if [ ! -z $PORT_MAPPING ];  then
+    docker_options="${docker_options} -p ${PORT_MAPPING}"
+fi
+if [ ! -z $CPU_CORES ];  then
+    docker_options="${docker_options} --cpus=${CPU_CORES}"
+fi
+docker_cmd="docker run ${docker_options} --device /dev/kfd --device /dev/dri -it --rm ${TAG}"
+
+if [ ! -z $log_dir ];  then
+    $docker_cmd 2>&1 | tee ${log_dir}/docker.run.log
+else
+    $docker_cmd
+fi
+
+exit $?

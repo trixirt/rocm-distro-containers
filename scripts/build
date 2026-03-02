@@ -1,0 +1,83 @@
+#!/bin/sh
+
+# Call with
+#   build.sh <path-to>/Dockerfile
+# or
+#   build.sh <path-to>
+#
+# Builds a docker image in the <path-to> directory and
+# stores it in tar file based on the <path-to> path and
+# the current date.
+
+# Uncomment to see running commands
+# set -x
+
+# Get the current directory
+# Did a directory or a file get passed in ?
+if [ ! -d $1 ]; then
+    current_dir=`dirname $1`
+else
+    current_dir=$1
+fi
+current_dir=`realpath $current_dir`
+if [ -z current_dir ]; then
+    echo "No path to docker file"
+    exit 1
+fi
+
+if [ ! -f ${current_dir}/Dockerfile ]; then
+    echo "No Dockerfile in ${current_dir}"
+    exit 1
+fi
+# Where the logs are
+log_dir=${current_dir}/log
+mkdir -p $log_dir
+
+# Get the two parent directories
+parent1=$(dirname "$current_dir")
+parent2=$(dirname "$parent1")
+
+# Extract the directory names (the last component)
+dir1=$(basename "$current_dir")
+dir2=$(basename "$parent1")
+dir3=$(basename "$parent2")
+
+# Get the current date in YYMMDD format
+date_suffix=$(date +%Y%m%d)
+
+cd $current_dir
+
+# Create the tag
+IMAGE_TAG="${dir3}_${dir2}_${dir1}_${date_suffix}"
+
+if [ -f ${IMAGE_TAG}.tar ]; then
+    echo "TAG: ${IMAGE_TAG}"
+    exit 0
+fi
+
+echo "" >> ${log_dir}/docker.build.log
+echo "Building for tag ${IMAGE_TAG}" >> ${log_dir}/docker.build.log
+echo "" >> ${log_dir}/docker.build.log
+
+docker build -t ${IMAGE_TAG} . 2>&1 >> ${log_dir}/docker.build.log
+
+# Check the build status
+if [ ${PIPESTATUS[0]} == 0 ]; then
+    echo "Docker image built successfully." >> ${log_dir}/docker.build.log
+    echo "TAG: ${IMAGE_TAG}"
+
+  # Create a tar archive of the image
+  echo "Creating tar archive of the image..." >> ${log_dir}/docker.build.log
+  docker save "${IMAGE_TAG}" > "${IMAGE_TAG}.tar" 2>&1 >> ${log_dir}/docker.build.log
+
+  if [ $? == 0 ]; then
+    echo "Image saved to ${IMAGE_TAG}.tar" >> ${log_dir}/docker.build.log
+  else
+    echo "Error: Failed to save image to tar archive." >> ${log_dir}/docker.build.log
+  fi
+else
+  echo "Error: Docker image build failed." >> ${log_dir}/docker.build.log
+  exit 1
+fi
+
+exit 0
