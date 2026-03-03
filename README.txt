@@ -426,3 +426,11 @@ rocm-rpp
 mivisionx
 rocal
 
+7. Scripts directory
+
+The scripts directory contains helper scripts for building and managing containers:
+
+- check-warnings.sh: Script to check for potential warnings or issues when building containers
+- import-src.sh: Script to import source files for container builds
+- run: Script to manage container execution (with various options for running containers)
+
