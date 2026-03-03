@@ -432,5 +432,10 @@ The scripts directory contains helper scripts for building and managing containe
 
 - check-warnings.sh: Script to check for potential warnings or issues when building containers
 - import-src.sh: Script to import source files for container builds
-- run: Script to manage container execution (with various options for running containers)
+- build: Script to build Docker images and save them as tar files with dated tags
+- run: Script to manage container execution with the following options:
+  - -t TAG: Set Docker image tag
+  - -p A:B: Port mapping for container
+  - -c NUM: Number of CPU cores to allocate (default: maximum cores)
+  - -v <local>:<remote>: Volume mapping between local and container paths
 
