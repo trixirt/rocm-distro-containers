@@ -67,8 +67,8 @@ if [ ${PIPESTATUS[0]} == 0 ]; then
     echo "TAG: ${IMAGE_TAG}"
 
   # Create a tar archive of the image
-  echo "Creating tar archive of the image..." >> ${log_dir}/docker.build.log
-  docker save "${IMAGE_TAG}" > "${IMAGE_TAG}.tar" 2>&1 >> ${log_dir}/docker.build.log
+    echo "Creating tar archive of the image..." >> ${log_dir}/docker.build.log
+    docker save -o ${IMAGE_TAG}.tar ${IMAGE_TAG}
 
   if [ $? == 0 ]; then
     echo "Image saved to ${IMAGE_TAG}.tar" >> ${log_dir}/docker.build.log
