@@ -27,5 +27,5 @@ RUN rpmbuild -ba --with test rocfft/rocfft.spec
 
 RUN dnf -y install ~/rpmbuild/RPMS/x86_64/rocfft-*
 
-# CMD ["rocfft-test"]
-CMD ["bash"]
+CMD ["rocfft-test"]
+# CMD ["bash"]
