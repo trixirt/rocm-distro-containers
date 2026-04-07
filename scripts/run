@@ -16,6 +16,9 @@
 #                   Can also be set with the environment variable RDC_VOLUMES, 
 #                   which should be a comma-separated list of volume mappings (e.g., 
 #                     /host/path:/container/path,/another/host/path:/another/container/path).
+#   -f FILENAME   :  Filename to use for the Docker run command (optional).
+#                   Can also be set with the environment variable RDC_FILENAME.
+#                   NOTE: FILENAME and TAG cannot both be set simultaneously.
 #
 
 #
@@ -49,6 +52,12 @@ if [ -n "$RDC_TAG" ]; then
   TAG="$RDC_TAG"  # Initialize TAG from environment variable if it exists
 else
   TAG=
+fi
+
+if [ -n "$RDC_FILENAME" ]; then
+  FILENAME="$RDC_FILENAME"  # Initialize FILENAME from environment variable if it exists
+else
+  FILENAME=
 fi
 
 MAX_CORES=$(nproc)
@@ -92,29 +101,12 @@ else
   VOLUMES=()  # Default to empty array if no environment variable
 fi
 
-#
-# Paths
-# Get the current directory
-# Did a directory or a file get passed in ?
-if [ ! -z $1 ];  then
-    if [ ! -d $1 ]; then
-	current_dir=`dirname $1`
-    else
-	current_dir=$1
-    fi
-    current_dir=`realpath $current_dir`
-
-    # Where the logs are
-    log_dir=${current_dir}/log
-    mkdir -p $log_dir
-fi
-
 # The script dir
 script_dir=`dirname $0`
 script_dir=`realpath $script_dir`
 
 # Parse command-line options
-while getopts "c:p:t:v:" opt; do  # Reordered options alphabetically
+while getopts "c:f:p:t:v:" opt; do  # Reordered options alphabetically
   case $opt in
     c)
       CPU_CORES_TEMP="$OPTARG"
@@ -127,6 +119,9 @@ while getopts "c:p:t:v:" opt; do  # Reordered options alphabetically
         fi
         CPU_CORES="$CPU_CORES_TEMP"
       fi
+      ;;
+    f)
+      FILENAME="$OPTARG"
       ;;
     p)
       PORT_MAPPING_TEMP="$OPTARG"
@@ -154,12 +149,12 @@ while getopts "c:p:t:v:" opt; do  # Reordered options alphabetically
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
-      echo "Usage: $0 [-c NUM] [-p A:B] [-t TAG] [-v <local path>:<remote path>]" >&2
+      echo "Usage: $0 [-c NUM] [-f FILENAME] [-p A:B] [-t TAG] [-v <local path>:<remote path>]" >&2
       exit 1
       ;;
     :)
       echo "Option -$OPTARG requires an argument." >&2
-      echo "Usage: $0 [-c NUM] [-p A:B] [-t TAG] [-v <local path>:<remote path>]" >&2
+      echo "Usage: $0 [-c NUM] [-f FILENAME] [-p A:B] [-t TAG] [-v <local path>:<remote path>]" >&2
       exit 1
       ;;
   esac
@@ -167,6 +162,13 @@ done
 
 # Remove the parsed options from the argument list
 shift $((OPTIND-1))
+
+# Validate that FILENAME and TAG are not both set
+if [ -n "$FILENAME" ] && [ -n "$TAG" ]; then
+  echo "Error: Both FILENAME and TAG cannot be set simultaneously." >&2
+  echo "Please specify either a filename OR a tag, not both." >&2
+  exit 1
+fi
 
 # Check if the tag exists
 if docker_tag_exists "${TAG}"; then
@@ -177,10 +179,26 @@ if docker_tag_exists "${TAG}"; then
 else
   echo "Docker image tag ${TAG} does not exist."
 
-  # Check for the tar file in the current directory
-  if [ -f "$current_dir/${TAG}.tar" ]; then
+  # Check if FILENAME is provided and exists as a tarball
+  if [ -n "$FILENAME" ] && [ -f "$FILENAME" ]; then
+    echo "Tar file '$FILENAME' found. Loading image..."
+    # Convert filename to absolute path for consistency
+    FILENAME=$(realpath "$FILENAME")
+    docker load -i "$FILENAME"
+    if [ $? -eq 0 ]; then
+      echo "Image loaded successfully."
+      # Set TAG to the basename of FILENAME (without .tar extension)
+      TAG=$(basename "$FILENAME" .tar)
+      # Continue with operations now that the image is loaded
+      echo "Continuing with operations using tag ${TAG} ..."
+    else
+      echo "Error: Failed to load image from $FILENAME."
+      echo "Exiting script."
+      exit 1
+    fi
+  elif [ -f "$PWD/${TAG}.tar" ]; then
     echo "Tar file '${TAG}.tar' found.  Loading image..."
-    docker load -i "$current_dir/${TAG}.tar"
+    docker load -i "$PWD/${TAG}.tar"
     if [ $? -eq 0 ]; then
       echo "Image loaded successfully."
       # Continue with operations now that the image is loaded
@@ -195,8 +213,8 @@ else
     echo "Tar file '${TAG}.tar' not found. Building from Dockerfile..."
 
     # Build the image from Dockerfile
-    if [ ! -z $current_dir ]; then
-	TAG=`$script_dir/build $current_dir | grep TAG: | awk '{ print $2 } '`
+    if [ ! -z $PWD ]; then
+	TAG=`$script_dir/build $PWD | grep TAG: | awk '{ print $2 } '`
 	echo $TAG
 	if [ $? -eq 0 ]; then
 	    echo "Image built successfully."
@@ -213,7 +231,6 @@ else
     fi
   fi
 fi
-
 
 # Now you can use the $TAG, $PORT_MAPPING, $CPU_CORES, and $VOLUMES variables within your script.
 echo "Using tag: $TAG"
@@ -237,10 +254,6 @@ if [ ! -z $CPU_CORES ];  then
 fi
 docker_cmd="docker run ${docker_options} --device /dev/kfd --device /dev/dri -it --rm ${TAG}"
 
-if [ ! -z $log_dir ];  then
-    $docker_cmd 2>&1 | tee ${log_dir}/docker.run.log
-else
-    $docker_cmd
-fi
+$docker_cmd
 
 exit $?
