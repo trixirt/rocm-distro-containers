@@ -9,15 +9,8 @@ RUN dnf install -y \
  rpmdevtools \
  rpmlint
 
-RUN dnf install -y \
-  ffmpeg-free \
-  libavcodec-free-devel \
-  libavformat-free-devel \
-  libavutil-free-devel \
-  rocprofiler-devel \
-
 RUN git clone https://src.fedoraproject.org/rpms/rocdecode.git
-RUN dnf -y builddep rocdecode/rocdecode.spec
+RUN dnf -y builddep --with test rocdecode/rocdecode.spec
 RUN spectool -g -R rocdecode/rocdecode.spec
 RUN cp rocdecode/* ~/rpmbuild/SOURCES
 # Need to install the samples first
