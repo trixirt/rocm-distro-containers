@@ -29,6 +29,7 @@ if [ ! -f ${current_dir}/Dockerfile ]; then
     echo "No Dockerfile in ${current_dir}"
     exit 1
 fi
+
 # Where the logs are
 log_dir=${current_dir}/log
 mkdir -p $log_dir
@@ -54,6 +55,9 @@ if [ -f ${IMAGE_TAG}.tar ]; then
     echo "TAG: ${IMAGE_TAG}"
     exit 0
 fi
+
+# Remove the existing tar files
+rm -f *.tar
 
 echo "" >> ${log_dir}/docker.build.log
 echo "Building for tag ${IMAGE_TAG}" >> ${log_dir}/docker.build.log
