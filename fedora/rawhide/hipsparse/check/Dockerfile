@@ -9,6 +9,9 @@ RUN dnf install -y \
  rpmdevtools \
  rpmlint
 
+RUN dnf --enablerepo='*debug*' install -y \
+ gdb
+
 RUN git clone https://src.fedoraproject.org/rpms/hipsparse.git
 RUN dnf -y builddep hipsparse/hipsparse.spec
 RUN spectool -g -R hipsparse/hipsparse.spec
@@ -31,6 +34,10 @@ RUN rpmbuild -ba --with test hipsparse/hipsparse.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipsparse*
 
-# CMD ["hipsparse-test"]
-CMD ["bash"]
+CMD ["hipsparse-test"]
+
+# Use to see the failure
+# CMD ["gdb", "hipsparse-test"]
+
+# CMD ["bash"]
 
