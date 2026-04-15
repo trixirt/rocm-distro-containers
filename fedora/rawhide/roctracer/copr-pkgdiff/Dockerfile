@@ -12,10 +12,11 @@
 FROM fedora:rawhide
 
 RUN dnf update -y
-RUN dnf install -y cpio libabigail
+RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora
 
 RUN mkdir /a
 RUN dnf download -y roctracer --destdir=/a
+RUN dnf download --source -y roctracer --destdir=/a
 RUN dnf download -y roctracer-devel --destdir=/a
 RUN dnf --enablerepo='*debug*' download -y roctracer-debuginfo --destdir=/a
 
@@ -24,6 +25,7 @@ RUN dnf update --nogpgcheck -y
 
 RUN mkdir /b
 RUN dnf download -y roctracer --destdir=/b
+RUN dnf download --source -y roctracer --destdir=/b
 RUN dnf download -y roctracer-devel --destdir=/b
 RUN dnf --enablerepo='*debug*' download -y roctracer-debuginfo --destdir=/b
 
