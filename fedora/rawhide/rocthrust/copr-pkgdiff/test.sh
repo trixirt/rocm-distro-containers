@@ -5,6 +5,8 @@
 # packages from both directories for comprehensive analysis. Output is written to
 # test.log file.
 
+# set -x
+
 devel_a=`ls a/*-devel-*`
 devel_b=`ls b/*-devel-*`
 src_a=`ls a/*.src.rpm`
