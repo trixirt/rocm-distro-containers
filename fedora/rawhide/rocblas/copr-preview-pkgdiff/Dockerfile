@@ -1,6 +1,6 @@
 # Dockerfile for ROCm ABI package diff testing
 # This container sets up an environment to compare ABI compatibility between
-# rocblas package versions from Fedora repository and ROCm COPR preview repository.
+# package versions from Fedora repository and ROCm COPR preview repository.
 # It:
 # 1. Installs required tools (cpio, libabigail, rpmlint, rpminspect)
 # 2. Downloads old packages from Fedora repository to /a/ directory
