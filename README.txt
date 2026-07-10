@@ -19,6 +19,9 @@ Some links for different distros
 Fedora
 https://developer.fedoraproject.org/tools/docker/docker-installation.html
 
+Centos
+https://docs.docker.com/engine/install/centos/
+
 OpenSUSE
 https://www.suse.com/c/rancher_blog/introduction-to-using-docker/
 
