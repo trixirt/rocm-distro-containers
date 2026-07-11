@@ -36,6 +36,7 @@ gpu=`rocm_agent_enumerator | grep -v gfx000 -m1`
 gpu_generic=$(gfx_generic $gpu)
 
 G="$gpu $gpu_generic"
+G=$gpu
 for g in $G; do
     cd /rocm-libraries/projects/rocrand
     if [ -d build ]; then
@@ -59,14 +60,10 @@ for g in $G; do
     
     if [ -f build.ninja ]; then
 	ninja
-	if [ $? = 0 ]; then
-	    ninja install
-	    export LD_LIBRARY_PATH=$prefix/lib64
-	    $prefix/bin/test_rocrand_xorwow_prng
-	else
-	    echo "failed to build"
-	    exit 1
-	fi
+	ctest --output-on-failure
+    else
+	echo "failed to build"
+	exit 1
     fi
 done
 

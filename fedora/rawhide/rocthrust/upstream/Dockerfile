@@ -13,7 +13,7 @@ RUN dnf install -y \
  time \
  gtest-devel
 
-RUN dnf -y builddep miopen
+RUN dnf -y builddep rocthrust
 RUN git clone https://github.com/ROCm/rocm-libraries
 
 COPY build.sh build.sh

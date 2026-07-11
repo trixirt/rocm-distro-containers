@@ -5,6 +5,7 @@ RUN dnf update -y
 RUN dnf install -y \
  git \
  ninja-build \
+ python3-yaml \
  rpm-build \
  rpmdevtools \
  rpmlint \

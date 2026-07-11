@@ -11,9 +11,14 @@ RUN dnf install -y \
  rpmlint \
  rocminfo \
  time \
- gtest-devel
+ amdsmi-devel \
+ rocm-smi-devel \
+ libomp-devel \
+ gcc-gfortran \
+ gtest-devel \
+ blas-devel
 
-RUN dnf -y builddep miopen
+RUN dnf -y builddep rocblas
 RUN git clone https://github.com/ROCm/rocm-libraries
 
 COPY build.sh build.sh

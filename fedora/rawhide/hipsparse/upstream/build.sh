@@ -40,7 +40,7 @@ export PATH="/usr/lib64/rocm/llvm/bin:$PATH"
 G="$gpu $gpu_generic"
 G=$gpu
 for g in $G; do
-    cd /rocm-libraries/projects/miopen
+    cd /rocm-libraries/projects/hipsparse
     if [ -d build ]; then
 	rm -rf build
     fi
@@ -51,21 +51,16 @@ for g in $G; do
     cmake .. \
 	  -G Ninja \
 	  -DAMDGPU_TARGETS=$g \
-	  -DBUILD_TESTING=ON \
+	  -DBUILD_CLIENTS_BENCHMARKS=ON \
+	  -DBUILD_CLIENTS_TESTS=ON \
+	  -DBUILD_FORTRAN_CLIENTS=OFF \
 	  -DCMAKE_AR=/usr/lib64/rocm/llvm/bin/llvm-ar \
 	  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	  -DCMAKE_CXX_COMPILER=/usr/lib64/rocm/llvm/bin/amdclang++ \
 	  -DCMAKE_C_COMPILER=/usr/lib64/rocm/llvm/bin/amdclang \
 	  -DCMAKE_INSTALL_PREFIX=$prefix \
 	  -DCMAKE_LINKER=/usr/lib64/rocm/llvm/bin/ld.lld \
-	  -DCMAKE_RANLIB=/usr/lib64/rocm/llvm/bin/llvm-ranlib \
-	  -DMIOPEN_BUILD_DRIVER=OFF \
-	  -DMIOPEN_ENABLE_AI_IMMED_MODE_FALLBACK=OFF \
-	  -DMIOPEN_ENABLE_AI_KERNEL_TUNING=OFF \
-	  -DMIOPEN_TEST_ALL=ON \
-	  -DMIOPEN_USE_HIPBLASLT=OFF \
-	  -DMIOPEN_USE_MLIR=OFF \
-	  -DMIOPEN_USE_COMPOSABLEKERNEL=OFF
+	  -DCMAKE_RANLIB=/usr/lib64/rocm/llvm/bin/llvm-ranlib
     
     if [ -f build.ninja ]; then
 	ninja

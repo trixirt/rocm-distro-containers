@@ -10,10 +10,9 @@ RUN dnf install -y \
  rpmdevtools \
  rpmlint \
  rocminfo \
- time \
- gtest-devel
+ time
 
-RUN dnf -y builddep miopen
+RUN dnf -y builddep hiprand
 RUN git clone https://github.com/ROCm/rocm-libraries
 
 COPY build.sh build.sh
