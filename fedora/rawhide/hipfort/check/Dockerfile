@@ -13,11 +13,9 @@ RUN git clone https://src.fedoraproject.org/rpms/hipfort.git
 RUN dnf -y builddep hipfort/hipfort.spec
 RUN spectool -g -R hipfort/hipfort.spec
 RUN cp hipfort/* ~/rpmbuild/SOURCES
-RUN rpmbuild -ba hipfort/hipfort.spec
 
-# Need rocminfo
-RUN dnf install -y rocminfo
-RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipfort*
+# Need hipfort-devel
+RUN dnf install -y rocminfo hipfort-devel
 
 CMD ["rpmbuild", "-ba", "--with", "check", "hipfort/hipfort.spec" ]
 # CMD ["bash" ]
