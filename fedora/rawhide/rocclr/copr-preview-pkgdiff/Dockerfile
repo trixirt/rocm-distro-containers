@@ -12,10 +12,11 @@
 FROM fedora:rawhide
 
 RUN dnf update -y
-RUN dnf install -y cpio libabigail
+RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora
 
 RUN mkdir /a
 RUN dnf download -y rocm-hip --destdir=/a
+RUN dnf download --source -y rocclr --destdir=/a
 RUN dnf download -y rocm-hip-devel --destdir=/a
 RUN dnf --enablerepo='*debug*' download -y rocm-hip-debuginfo --destdir=/a
 
@@ -24,6 +25,7 @@ RUN dnf update --nogpgcheck -y
 
 RUN mkdir /b
 RUN dnf download -y rocm-hip --destdir=/b
+RUN dnf download --source -y rocclr --destdir=/b
 RUN dnf download -y rocm-hip-devel --destdir=/b
 RUN dnf --enablerepo='*debug*' download -y rocm-hip-debuginfo --destdir=/b
 
