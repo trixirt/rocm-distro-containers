@@ -18,6 +18,15 @@ echo "== abipkgdiff == " 2>&1 | tee test.log
 abipkgdiff $a $b \
 	   --devel1 $devel_a --devel2 $devel_b \
 	   --d1 $debuginfo_a --d2 $debuginfo_b 2>&1 | tee test.log
+# abipkgdiff: abg-dwarf-reader.cc:14188: ...  failed.
+grep abg-dwarf-reader test.log
+if [ $? = 0 ]; then
+    echo "Trying without debug info" 2>&1 | tee test.log
+    abipkgdiff $a $b \
+	       --devel1 $devel_a --devel2 $devel_b | tee test.log
+fi
+
+sleep 5
 
 echo "" 2>&1 | tee -a test.log
 echo "== rpmlint == " 2>&1 | tee -a test.log
