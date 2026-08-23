@@ -12,6 +12,8 @@ RUN dnf install -y \
  rocminfo \
  time
 
+RUN dnf install -y sccache
+
 # for tests
 RUN dnf install -y \
  nodejs22-npm \
@@ -22,5 +24,5 @@ RUN git clone https://github.com/ggerganov/llama.cpp
 
 COPY build.sh build.sh
 
-CMD ["bash", "build.sh"]
+CMD ["bash", "build.sh", "5"]
 # CMD ["bash"]
