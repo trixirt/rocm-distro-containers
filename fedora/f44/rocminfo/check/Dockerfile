@@ -1,20 +1,7 @@
-FROM fedora:f44
+FROM fedora:44
 
 RUN dnf update -y
 
-RUN dnf install -y \
- fedora-review \
- git \
- rpm-build \
- rpmdevtools \
- rpmlint
-
-RUN git clone -b f44 https://src.fedoraproject.org/rpms/rocminfo.git
-RUN dnf -y builddep rocminfo/rocminfo.spec
-RUN spectool -g -R rocminfo/rocminfo.spec
-RUN cp rocminfo/* ~/rpmbuild/SOURCES
-RUN rpmbuild -ba rocminfo/rocminfo.spec
-
-RUN rpm -ihv --nodeps ~/rpmbuild/RPMS/x86_64/*
+RUN dnf install -y rocminfo
 
 CMD ["/usr/bin/rocminfo"]
