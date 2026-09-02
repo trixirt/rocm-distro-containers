@@ -17,19 +17,19 @@ RUN dnf update -y
 RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora abi-compliance-checker
 
 RUN mkdir /a
-RUN dnf download -y rocrand --destdir=/a
-RUN dnf download --source -y rocrand --destdir=/a
-RUN dnf download -y rocrand-devel --destdir=/a
-RUN dnf --enablerepo='*debug*' download -y rocrand-debuginfo --destdir=/a
+RUN dnf download -y hipsparse --destdir=/a
+RUN dnf download --source -y hipsparse --destdir=/a
+RUN dnf download -y hipsparse-devel --destdir=/a
+RUN dnf --enablerepo='*debug*' download -y hipsparse-debuginfo --destdir=/a
 
 RUN dnf config-manager addrepo --from-repofile=https://copr.fedorainfracloud.org/coprs/g/rocm-packagers-sig/preview/repo/fedora-rawhide/group_rocm-packagers-sig-preview-fedora-rawhide.repo
 RUN dnf update --nogpgcheck -y
 
 RUN mkdir /b
-RUN dnf download -y rocrand --destdir=/b
-RUN dnf download --source -y rocrand --destdir=/b
-RUN dnf download -y rocrand-devel --destdir=/b
-RUN dnf --enablerepo='*debug*' download -y rocrand-debuginfo --destdir=/b
+RUN dnf download -y hipsparse --destdir=/b
+RUN dnf download --source -y hipsparse --destdir=/b
+RUN dnf download -y hipsparse-devel --destdir=/b
+RUN dnf --enablerepo='*debug*' download -y hipsparse-debuginfo --destdir=/b
 
 COPY test.sh test.sh
 

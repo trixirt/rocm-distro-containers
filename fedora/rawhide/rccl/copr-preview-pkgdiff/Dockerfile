@@ -9,10 +9,12 @@
 #    and package analysis using rpmlint and rpminspect
 # The test.log file contains the diff results
 
-FROM fedora:rawhide
+# fedora-cisco-openh264
+# FROM fedora:rawhide
+FROM fedora:45
 
 RUN dnf update -y
-RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora
+RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora abi-compliance-checker
 
 RUN mkdir /a
 RUN dnf download -y rccl --destdir=/a
