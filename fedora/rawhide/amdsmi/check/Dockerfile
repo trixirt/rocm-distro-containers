@@ -10,11 +10,12 @@ RUN dnf install -y \
  rpmlint
 
 RUN git clone https://src.fedoraproject.org/rpms/amdsmi.git
-RUN dnf -y builddep --with test amdsmi/amdsmi.spec
+RUN dnf -y builddep --with test --with static amdsmi/amdsmi.spec
 RUN spectool -g -R amdsmi/amdsmi.spec
-RUN cp amdsmi/* ~/rpmbuild/SOURCES
-RUN rpmbuild -ba --with test amdsmi/amdsmi.spec
+RUN cp -r amdsmi/* ~/rpmbuild/SOURCES
+RUN rpmbuild -ba --with test --with static amdsmi/amdsmi.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 CMD ["/usr/share/amdsmi/tests/amdsmitst"]
+# CMD ["bash"]

@@ -12,7 +12,7 @@ RUN dnf install -y \
 RUN git clone https://src.fedoraproject.org/rpms/rocminfo.git
 RUN dnf -y builddep rocminfo/rocminfo.spec
 RUN spectool -g -R rocminfo/rocminfo.spec
-RUN cp rocminfo/* ~/rpmbuild/SOURCES
+RUN cp -r rocminfo/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba rocminfo/rocminfo.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
