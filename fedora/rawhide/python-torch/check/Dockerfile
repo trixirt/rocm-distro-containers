@@ -3,9 +3,11 @@ FROM fedora:rawhide
 RUN dnf update -y
 
 RUN dnf install -y \
+ gcc-c++ \
  python3-torch \
  python3-expecttest \
  python3-psutil \
+ python3-triton \
  pytest \
  rpm-build \
  rocminfo
