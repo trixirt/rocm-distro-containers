@@ -29,7 +29,15 @@ src_b=${b//".x86_64.rpm"/}.src.rpm
 echo "== abipkgdiff == " 2>&1 | tee /output/test.log
 abipkgdiff $a $b \
 	   --devel1 $devel_a --devel2 $devel_b \
-	   --d1 $debuginfo_a --d2 $debuginfo_b 2>&1 | tee /output/test.log
+	   --d1 $debuginfo_a --d2 $debuginfo_b 2>&1 | tee -a /output/test.log
+
+# abipkgdiff: abg-dwarf-reader.cc:14188: ...  failed.
+grep abg-dwarf-reader /output/test.log
+if [ $? = 0 ]; then
+    echo "Trying without debug info" 2>&1 | tee test.log
+    abipkgdiff $a $b \
+	       --devel1 $devel_a --devel2 $devel_b | 2>&1 | tee -a /output/test.log
+fi
 
 # ---------------------------------------------------------
 # SECTION 2: RPM Spec & Content Lints (Main Package)

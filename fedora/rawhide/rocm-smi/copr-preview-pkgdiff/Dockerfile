@@ -12,7 +12,7 @@
 FROM fedora:rawhide
 
 RUN dnf update -y
-RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora
+RUN dnf install -y cpio libabigail rpmlint rpminspect rpminspect-data-fedora  abi-compliance-checker
 
 RUN mkdir /a
 RUN dnf download -y rocm-smi --destdir=/a

@@ -10,5 +10,5 @@ docker logs ${CID} > output/docker-run.log
 docker cp ${CID}:/output/. output/
 docker rm -f ${CID}
 
-rm -f /tmp/rocblas.txt
+rm -f /tmp/rocm-runtime.txt
 pi < ~/ai/fedora-pi-prompts/test/docker-pkgdiff.xml
