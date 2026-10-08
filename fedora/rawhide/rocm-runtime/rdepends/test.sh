@@ -14,7 +14,7 @@ failed_to_install_packages=""
 
 # Find reverse dependencies using dnf repoquery
 # Note: On Fedora, we may need to handle the case where repoquery isn't available
-P=$(dnf repoquery --whatrequires rocm-runtime 2>/dev/null || echo "")
+P=$(dnf repoquery --recursive --whatrequires rocm-runtime 2>/dev/null || echo "")
 
 # Print each package in the P list and load it
 for pkg in $P; do
