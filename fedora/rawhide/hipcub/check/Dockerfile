@@ -25,4 +25,5 @@ RUN dnf -y builddep hipcub/hipcub.spec
 RUN spectool -g -R hipcub/hipcub.spec
 RUN cp hipcub/* ~/rpmbuild/SOURCES
 
-CMD ["rpmbuild", "-ba", "--with", "check", "hipcub/hipcub.spec"]
+CMD ["rpmbuild", "-ba", "--with", "test", "--with", "check", "hipcub/hipcub.spec"]
+# CMD ["bash"]
