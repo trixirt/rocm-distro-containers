@@ -9,3 +9,6 @@ docker wait ${CID}
 docker logs ${CID} > output/docker-run.log
 docker cp ${CID}:/output/. output/
 docker rm -f ${CID}
+
+rm -f /tmp/rocsolver.txt
+pi < ~/ai/fedora-pi-prompts/test/docker-pkgdiff.xml
