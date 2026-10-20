@@ -49,7 +49,11 @@ RUN rpmbuild -ba --with test rocsolver/rocsolver.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/rocsolver*
 
-CMD ["rocsolver-test"]
+COPY test.sh /
+
+CMD ["/test.sh"]
+
+# CMD ["rocsolver-test"]
 
 # CMD ["gdb", "rocsolver-test"]
 # CMD ["bash"]

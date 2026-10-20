@@ -18,14 +18,6 @@ RUN rpmbuild -ba --with test hipfft/hipfft.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
-# CMD ["hipfft-test"]
+COPY test.sh /
 
-RUN dnf install -y gdb
-
-RUN dnf --enablerepo='*debug*' install -y \
- rocm-runtime-debuginfo \
- rocm-hip-debuginfo \
- rocm-comgr-debuginfo \
- libstdc++-debuginfo \
-
-CMD ["gdb", "/usr/bin/hipfft-test" ]
+CMD ["/test.sh"]

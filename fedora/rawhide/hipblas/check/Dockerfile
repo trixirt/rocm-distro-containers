@@ -17,7 +17,9 @@ RUN cp hipblas/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba --with test hipblas/hipblas.spec
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipblas*
 
-CMD ["hipblas-test"]
+COPY test.sh /
+
+CMD ["/test.sh"]
 
 # CMD ["bash"]
 

@@ -9,14 +9,6 @@ RUN dnf install -y \
  rpmdevtools \
  rpmlint
 
-RUN dnf install -y \
- blas-devel \
- libomp-devel \
- python3-pyyaml \
- rocminfo \
- rocm-smi-devel \
- roctracer-devel
-
 RUN dnf --enablerepo='*debug*' install -y \
  gdb \
  rocm-smi-debuginfo \
@@ -43,7 +35,7 @@ RUN rpmbuild -ba gtest/gtest.spec
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/*
 
 RUN git clone https://src.fedoraproject.org/rpms/rocblas.git
-RUN dnf -y builddep rocblas/rocblas.spec
+RUN dnf -y builddep --with test rocblas/rocblas.spec
 RUN spectool -g -R rocblas/rocblas.spec
 RUN cp -r rocblas/* ~/rpmbuild/SOURCES
 RUN rpmbuild -ba --with test rocblas/rocblas.spec

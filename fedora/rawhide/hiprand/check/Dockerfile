@@ -27,4 +27,8 @@ RUN rpmbuild -ba --with test hiprand/hiprand.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hiprand*
 
-CMD ["bash", "-c", "for f in /usr/bin/test_hiprand*; do $f; done"]
+COPY test.sh /
+
+CMD ["/test.sh"]
+
+# CMD ["bash", "-c", "for f in /usr/bin/test_hiprand*; do $f; done"]
