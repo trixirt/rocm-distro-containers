@@ -34,7 +34,9 @@ RUN rpmbuild -ba --with test hipsparse/hipsparse.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipsparse*
 
-CMD ["hipsparse-test"]
+COPY test.sh /
+
+CMD ["/test.sh"]
 
 # Use to see the failure
 # CMD ["gdb", "hipsparse-test"]

@@ -32,4 +32,6 @@ RUN rpmbuild -ba --with test hipsolver/hipsolver.spec
 
 RUN rpm -ihv --nosignature --nodeps ~/rpmbuild/RPMS/x86_64/hipsolver*
 
-CMD ["hipsolver-test"]
+COPY test.sh /
+
+CMD ["/test.sh"]
