@@ -1,0 +1,68 @@
+From 791f25c90205d77df6094085a83c41a462c6fce6 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Thu, 26 Nov 2026 21:04:03 -0800
+Subject: [PATCH] [hipthreads] cmake: honor BUILD_SHARED_LIBS and version the
+ shared library
+
+add_library() hardcoded STATIC, so the standard BUILD_SHARED_LIBS
+variable had no effect and the package could not be built as a shared
+library (Fedora does not accept static-only libraries).
+
+Drop the explicit STATIC so BUILD_SHARED_LIBS works as usual, and when
+building the shared library:
+- set VERSION/SOVERSION via the new HIPTHREADS_SOVERSION variable
+  (default: the project version, libhipthreads.so.1.0.0); packagers may
+  override it, e.g. -DHIPTHREADS_SOVERSION=10.2 to follow the ROCm
+  release;
+- device-link the -fgpu-rdc object into the library (--hip-link), the
+  same step the test executables already perform at final link.
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ projects/hipthreads/src/CMakeLists.txt | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/projects/hipthreads/src/CMakeLists.txt b/projects/hipthreads/src/CMakeLists.txt
+index 2203938b1152..71a7fa702ff7 100644
+--- a/projects/hipthreads/src/CMakeLists.txt
++++ b/projects/hipthreads/src/CMakeLists.txt
+@@ -7,11 +7,11 @@ cmake_minimum_required(VERSION 3.21)
+ #             bugprone-*,-bugprone-easily-swappable-parameters,                                                          \
+ #             concurrency-*")
+ 
+-# Turn static library generation ON
++# Generate libhipthreads.a by default, or libhipthreads.so when
++# BUILD_SHARED_LIBS is ON.
+ option(BUILD_SHARED_LIBS "Build as a shared library" OFF)
+ 
+-# Generate static lib libhipthreads.a
+-add_library(hipthreads STATIC hip/thread.cxx)
++add_library(hipthreads hip/thread.cxx)
+ set_source_files_properties(hip/thread.cxx PROPERTIES LANGUAGE HIP)
+ target_include_directories(hipthreads PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/inc>
+@@ -39,6 +39,21 @@ endif()
+ 
+ target_link_libraries(hipthreads PUBLIC libhipcxx::libhipcxx)
+ 
++if(BUILD_SHARED_LIBS)
++  # VERSION/SOVERSION of the shared library. Defaults to the project
++  # version (libhipthreads.so.1.0.0); packagers may override it, e.g. to
++  # follow the ROCm release: -DHIPTHREADS_SOVERSION=10.2
++  set(HIPTHREADS_SOVERSION "${PROJECT_VERSION}" CACHE STRING
++    "VERSION and SOVERSION of the shared library")
++  set_target_properties(hipthreads PROPERTIES
++    VERSION ${HIPTHREADS_SOVERSION}
++    SOVERSION ${HIPTHREADS_SOVERSION}
++  )
++  # The source is compiled with -fgpu-rdc; device-link the RDC object
++  # into the shared library, as the test executables do at final link.
++  target_link_options(hipthreads PRIVATE "--hip-link")
++endif()
++
+ 
+ # add_custom_command(TARGET hipthreads POST_BUILD
+ #     COMMAND ${LLVM_DIS} ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/hipthreads.dir/hip/thread-host-x86_64-unknown-linux-gnu.bc
+-- 
+2.56.1
+
